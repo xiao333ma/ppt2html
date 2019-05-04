@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego/httplib"
 	"io/ioutil"
+	"net"
 	"os"
 	"os/exec"
 	. "ppt2html/common"
@@ -69,6 +70,7 @@ var FileAllow = map[string]interface{}{
 //}
 
 func (this *UploadController) Post() {
+	this.EnableRender = false
 	f,h,_ := this.GetFile("myfile")
 	fileName := h.Filename
 	fileSuffix := GetFileSuffix(fileName)
@@ -97,10 +99,30 @@ func (this *UploadController) Post() {
 	fmt.Println(full_path)
 	fmt.Println(dir_path)
 
+
+
+
+
 	if io_error == nil {
 		cmd := exec.Command("osascript", script_path,full_path,dir_path)
 		_, err := cmd.CombinedOutput()
 		fmt.Println(err)
+		result := new(UploadResultInfo)
+
+
+		addrs, err := net.InterfaceAddrs()
+		ip := ""
+		for _, address := range addrs {
+			// 检查ip地址判断是否回环地址
+			if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+				if ipnet.IP.To4() != nil {
+					ip = ipnet.IP.String()+":8080"
+				}
+			}
+		}
+		result.Message = "http://"+ip+"/static/upload/"+str+"/index.html"
+		this.Data["json"] = result
+		this.ServeJSON()
 	}
 
 
