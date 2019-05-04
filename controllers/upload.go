@@ -15,8 +15,8 @@ import (
 )
 
 type UploadResultInfo struct {
-	ResultCode bool   `json:"resultCode"`
-	Message    string `json:"message"`
+	Tip string   `json:"tip"`
+	URL    string `json:"url"`
 }
 
 type UploadController struct {
@@ -120,7 +120,8 @@ func (this *UploadController) Post() {
 				}
 			}
 		}
-		result.Message = "http://"+ip+"/static/upload/"+str+"/index.html"
+		result.Tip = "转换成功"
+		result.URL = "http://"+ip+"/static/upload/"+str+"/index.html"
 		this.Data["json"] = result
 		this.ServeJSON()
 	}
