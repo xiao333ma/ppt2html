@@ -1,0 +1,6 @@
+# GOLANG
+.idea/
+pkg/
+.build/
+.static/
+
