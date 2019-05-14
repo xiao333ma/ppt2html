@@ -91,11 +91,11 @@ func (this *UploadController) Post() {
 	}
 	full_path := dir_path+file_name
 	io_error := ioutil.WriteFile(full_path, fileBytes, 0777)
-	
-	workSpace, _ := os.Getwd()
-	script_path := workSpace+"/"+"ppt2html.scpt"
+	script_path := GetScriptPath()+"/"+"ppt2html.scpt"
 
+	fmt.Println("--------------------")
 	fmt.Println(script_path)
+	fmt.Println("--------------------")
 	fmt.Println(full_path)
 	fmt.Println(dir_path)
 

@@ -3,6 +3,7 @@ package common
 import (
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/utils"
+	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -29,6 +30,42 @@ func GetStaticPath() string {
 	}
 	return staticPath
 }
+
+
+
+
+
+func GetViewsPath() string {
+	path := ""
+	workSpace, err_ws := os.Getwd()
+	if err_ws != nil {
+		panic(err_ws)
+	}
+	path = filepath.Join(workSpace, "views")
+	if !utils.FileExists(path) {
+		appPath, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			panic(err)
+		}
+		path = filepath.Join(appPath, "views")
+	}
+
+	if len(path) < 1 {
+		path = "views"
+	}
+	return path
+}
+
+
+func GetScriptPath() string {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))  //返回绝对路径  filepath.Dir(os.Args[0])去除最后一个元素的路径
+	if err != nil {
+		log.Fatal(err)
+	}
+	strings.Replace(dir, "\\", "/", -1) //将\替换成/
+	return dir
+}
+
 
 //获取用户IP地址
 func GetClientIp(this *context.Context) string {
