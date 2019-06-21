@@ -30,8 +30,12 @@
   version = "1.11.1"
 
 [[constraint]]
+  branch = "master"
+  name = "github.com/axgle/mahonia"
+
+[[constraint]]
   name = "github.com/go-redis/redis"
-  version = "6.15.2"
+  version = "6.15.3"
 
 [[constraint]]
   branch = "master"

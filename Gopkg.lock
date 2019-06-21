@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  digest = "1:ec5431be0851d1eb9494275a3b3595ae300d2be49e7bc7fbb103cd3c85394130"
+  digest = "1:5bac76509f3a58c157a95bab9ca8c742c1994ce72ae383837f98d487bb9fe9f3"
   name = "github.com/astaxie/beego"
   packages = [
     ".",
@@ -10,7 +10,6 @@
     "context",
     "context/param",
     "grace",
-    "httplib",
     "logs",
     "session",
     "toolbox",
@@ -21,7 +20,15 @@
   version = "v1.11.1"
 
 [[projects]]
-  digest = "1:33082c63746b464db3d1c2c07a1396d860484d97fe857ef9e8668a9b406db09f"
+  branch = "master"
+  digest = "1:673c9c345144a4a631ae6f97a80e119367ad2d898306fcb05e64ce29d3b834d5"
+  name = "github.com/axgle/mahonia"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3358181d7394e26beccfae0ffde05193ef3be33a"
+
+[[projects]]
+  digest = "1:c950e574951c7199fb3d990d0e7a61996f40f8e646ba7cf8a557878d4c737f53"
   name = "github.com/go-redis/redis"
   packages = [
     ".",
@@ -33,8 +40,8 @@
     "internal/util",
   ]
   pruneopts = "UT"
-  revision = "d22fde8721cc915a55aeb6b00944a76a92bfeb6e"
-  version = "v6.15.2"
+  revision = "75795aa4236dc7341eefac3bbe945e68c99ef9df"
+  version = "v6.15.3"
 
 [[projects]]
   branch = "master"
@@ -109,8 +116,8 @@
   input-imports = [
     "github.com/astaxie/beego",
     "github.com/astaxie/beego/context",
-    "github.com/astaxie/beego/httplib",
     "github.com/astaxie/beego/utils",
+    "github.com/axgle/mahonia",
     "github.com/go-redis/redis",
     "github.com/samuel/go-zookeeper/zk",
     "github.com/smartystreets/goconvey/convey",
