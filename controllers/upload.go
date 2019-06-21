@@ -57,18 +57,11 @@ func (this *UploadController) Post() {
 	io_error := ioutil.WriteFile(full_path, fileBytes, 0777)
 	script_path := GetScriptPath()+"/"+"ppt2html.scpt"
 
-	fmt.Println("--------------------")
-	fmt.Println(script_path)
-	fmt.Println(full_path)
-	fmt.Println(dir_path)
-
-
 	if io_error == nil {
 		cmd := exec.Command("osascript", script_path,full_path,dir_path)
 		_, err := cmd.CombinedOutput()
 		fmt.Println(err)
 		result := new(UploadResultInfo)
-
 
 		addrs, err := net.InterfaceAddrs()
 		ip := ""
@@ -87,6 +80,6 @@ func (this *UploadController) Post() {
 	}
 }
 
-func (c *UploadController) Get() {
-	  c.TplName = "upload.html"
-}
+//func (c *UploadController) Get() {
+//	  c.TplName = "upload.html"
+//}
