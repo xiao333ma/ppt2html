@@ -6,18 +6,18 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
-	"net"
+	"os"
 	"os/exec"
 	. "ppt2html/common"
 )
 
 type UploadResultInfo struct {
-	Tip    string   `json:"tip"`
-	URL    string   `json:"url"`
+	Code     int    `json:"code"`
+	FileName string `json:"fileName"`
 }
 
 type UploadController struct {
-	 MainController
+	MainController
 }
 
 type Sizer interface {
@@ -29,57 +29,63 @@ var FileSize int64 = 300 * 1024 * 1024 //300M
 var FileAllow = map[string]interface{}{
 	"ppt":  nil,
 	"pptx": nil,
-	"pdf":  nil,
+	"key":  nil,
 }
-
 
 func (this *UploadController) Post() {
 	this.EnableRender = false
-	f,h,_ := this.GetFile("myfile")
+	result := new(UploadResultInfo)
+	result.Code = -1
+	f, h, _ := this.GetFile("myfile")
 	fileName := h.Filename
 	fileSuffix := GetFileSuffix(fileName)
-	fmt.Println(fileName)
-	fmt.Println(fileSuffix)
-	fileBytes, _ := ioutil.ReadAll(f)
-	data := md5.Sum(fileBytes)
 
-	str := hex.EncodeToString(data[:])
-	file_name := fmt.Sprintf("%s.%s", str, fileSuffix)
-	fmt.Println(file_name)
-	dir_path := GetUloadFileBaseDir()
-	dir_path = dir_path+"/"
-	
+	if _, ok := FileAllow[fileSuffix]; !ok {
+		result.Code = 1000 //代表非法的后缀名
+	} else {
+		mountPath := ""
+		homeDir := GetUserHomePath()
+		if len(homeDir) > 0 {
+			mountPath = homeDir + "/data/ppt"
+		}
 
-	if !HasFile(GetUloadFileBaseDir()) {
-		MakeFileDir("")
-	}
-	full_path := dir_path+file_name
-	io_error := ioutil.WriteFile(full_path, fileBytes, 0777)
-	script_path := GetScriptPath()+"/"+"ppt2html.scpt"
+		fileBytes, _ := ioutil.ReadAll(f)
+		data := md5.Sum(fileBytes)
 
-	if io_error == nil {
-		cmd := exec.Command("osascript", script_path,full_path,dir_path)
-		_, err := cmd.CombinedOutput()
-		fmt.Println(err)
-		result := new(UploadResultInfo)
+		str := hex.EncodeToString(data[:])
+		file_name := fmt.Sprintf("%s.%s", str, fileSuffix)
+		dir_path := GetUloadFileBaseDir()
+		dir_path = dir_path + "/"
 
-		addrs, err := net.InterfaceAddrs()
-		ip := ""
-		for _, address := range addrs {
-			// 检查ip地址判断是否回环地址
-			if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-				if ipnet.IP.To4() != nil {
-					ip = ipnet.IP.String()+":8080"
-				}
+		if !HasFile(GetUloadFileBaseDir()) {
+			MakeFileDir("")
+		}
+		full_path := dir_path + file_name
+		io_error := ioutil.WriteFile(full_path, fileBytes, 0777)
+		script_path := GetScriptPath() + "/" + "ppt2html.scpt"
+		fmt.Println(full_path)
+		if io_error == nil && len(mountPath) > 0 {
+			cmd := exec.Command("osascript", script_path, full_path, dir_path)
+			_, cmdErr := cmd.CombinedOutput()
+			result.Code = 0
+			result.FileName = str
+			if cmdErr == nil {
+				oldPath := dir_path + "/" + str
+				newPath := mountPath + "/" + str
+				go fileHandle(oldPath, newPath, full_path)
 			}
 		}
-		result.Tip = "转换成功"
-		result.URL = "http://"+ip+"/static/upload/"+str+"/index.html"
-		this.Data["json"] = result
-		this.ServeJSON()
 	}
+	this.Data["json"] = result
+	this.ServeJSON()
 }
 
-//func (c *UploadController) Get() {
-//	  c.TplName = "upload.html"
-//}
+func fileHandle(source string, dest string, filePath string) {
+	CopyFolder(source, dest)
+	os.RemoveAll(source)
+	os.Remove(filePath)
+}
+
+func (c *UploadController) Get() {
+	c.TplName = "upload.html"
+}
