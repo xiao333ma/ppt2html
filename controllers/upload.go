@@ -67,24 +67,27 @@ func (this *UploadController) Post() {
 		if io_error == nil && len(mountPath) > 0 {
 			cmd := exec.Command("osascript", script_path, full_path, dir_path)
 			_, cmdErr := cmd.CombinedOutput()
-			result.Code = 0
-			result.FileName = str
-			if cmdErr == nil {
-				oldPath := dir_path + "/" + str
-				newPath := mountPath + "/" + str
-				go fileHandle(oldPath, newPath, full_path)
+			fmt.Println(cmdErr)
+			oldPath := dir_path + "/" + str
+			newPath := mountPath + "/" + str
+			copyErr  := CopyFolder(oldPath, newPath)
+			if copyErr == nil {
+				result.Code = 0
+				result.FileName = str
 			}
+			os.RemoveAll(oldPath)
+			os.Remove(full_path)
 		}
 	}
 	this.Data["json"] = result
 	this.ServeJSON()
 }
 
-func fileHandle(source string, dest string, filePath string) {
-	CopyFolder(source, dest)
-	os.RemoveAll(source)
-	os.Remove(filePath)
-}
+//func fileHandle(source string, dest string, filePath string) {
+//	CopyFolder(source, dest)
+//	os.RemoveAll(source)
+//	os.Remove(filePath)
+//}
 
 func (c *UploadController) Get() {
 	c.TplName = "upload.html"
