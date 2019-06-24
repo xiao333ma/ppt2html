@@ -74,6 +74,8 @@ func (this *UploadController) Post() {
 			if copyErr == nil {
 				result.Code = 0
 				result.FileName = str
+			}else {
+				result.Code = 2
 			}
 			os.RemoveAll(oldPath)
 			os.Remove(full_path)
