@@ -32,7 +32,25 @@ var FileAllow = map[string]interface{}{
 	"key":  nil,
 }
 
+func (this *UploadController) Prepare() {
+	script_path := GetScriptPath() + "/" + "close.scpt"
+	fmt.Println(script_path)
+	cmd := exec.Command("osascript", script_path)
+	b,e := cmd.CombinedOutput()
+	fmt.Println(string(b))
+	fmt.Println(e)
+}
+
+// code 0 成功
+// code -1 未知功能
+// code 1000 非法后缀名
+// code 2 拷贝失败
 func (this *UploadController) Post() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("捕获到了从panic产生的异常：", err) // 这里的err就是panic传入的内容
+		}
+	}()
 	this.EnableRender = false
 	result := new(UploadResultInfo)
 	result.Code = -1
@@ -85,12 +103,6 @@ func (this *UploadController) Post() {
 	this.ServeJSON()
 }
 
-//func fileHandle(source string, dest string, filePath string) {
-//	CopyFolder(source, dest)
-//	os.RemoveAll(source)
-//	os.Remove(filePath)
-//}
-
-func (c *UploadController) Get() {
-	c.TplName = "upload.html"
+func (this *UploadController) Get() {
+	this.TplName = "upload.html"
 }
