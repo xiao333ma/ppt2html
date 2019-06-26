@@ -32,11 +32,12 @@ var FileAllow = map[string]interface{}{
 	"key":  nil,
 }
 
-func (this *UploadController) Prepare() {
-	script_path := GetScriptPath() + "/" + "close.scpt"
-	fmt.Println(script_path)
-	cmd := exec.Command("osascript", script_path)
+func (this *UploadController) Finish() {
+
+
+	cmd := exec.Command("killall", "Keynote")
 	b,e := cmd.CombinedOutput()
+	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 	fmt.Println(string(b))
 	fmt.Println(e)
 }

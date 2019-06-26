@@ -10,7 +10,6 @@ import (
 
 func main() {
 	moveScript("/Users/liuche/GO_WorkSpace/src/ppt2html/ppt2html.scpt",common.GetScriptPath() + "/" + "ppt2html.scpt")
-	moveScript("/Users/liuche/GO_WorkSpace/src/ppt2html/close.scpt",common.GetScriptPath() + "/" + "close.scpt")
 	beego.AddAPPStartHook()
 	beego.SetStaticPath("/static", common.GetStaticPath())
 	beego.SetViewsPath(common.GetViewsPath())
