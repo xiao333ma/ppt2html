@@ -32,16 +32,6 @@ var FileAllow = map[string]interface{}{
 	"key":  nil,
 }
 
-func (this *UploadController) Finish() {
-
-
-	cmd := exec.Command("killall", "Keynote")
-	b,e := cmd.CombinedOutput()
-	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-	fmt.Println(string(b))
-	fmt.Println(e)
-}
-
 // code 0 成功
 // code -1 未知功能
 // code 1000 非法后缀名
@@ -100,6 +90,10 @@ func (this *UploadController) Post() {
 			os.Remove(full_path)
 		}
 	}
+
+	cmd := exec.Command("killall", "Keynote")
+	cmd.CombinedOutput()
+
 	this.Data["json"] = result
 	this.ServeJSON()
 }
