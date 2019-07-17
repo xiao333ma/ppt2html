@@ -77,13 +77,15 @@ func (this *UploadController) Post() {
 			cmd := exec.Command("osascript", script_path, full_path, dir_path)
 			_, cmdErr := cmd.CombinedOutput()
 			fmt.Println(cmdErr)
-			oldPath := dir_path + "/" + str
+			oldPath := dir_path  + str
 			newPath := mountPath + "/" + str
 			copyErr  := CopyFolder(oldPath, newPath)
 			if copyErr == nil {
 				result.Code = 0
 				result.FileName = str
 			}else {
+				fmt.Println("出错了~~~~~~~~~~~~~~~~~~~~~`")
+				fmt.Println(copyErr)
 				result.Code = 2
 			}
 			os.RemoveAll(oldPath)
