@@ -2,8 +2,6 @@ package controllers
 
 import (
 	_ "bytes"
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -46,6 +44,7 @@ func (this *UploadController) Post() {
 	result := new(UploadResultInfo)
 	result.Code = -1
 	f, h, _ := this.GetFile("myfile")
+	inputFileName :=  this.GetString("fileName")
 	fileName := h.Filename
 	fileSuffix := GetFileSuffix(fileName)
 
@@ -59,9 +58,10 @@ func (this *UploadController) Post() {
 		}
 
 		fileBytes, _ := ioutil.ReadAll(f)
-		data := md5.Sum(fileBytes)
+		//data := md5.Sum(fileBytes)
 
-		str := hex.EncodeToString(data[:])
+		//str := hex.EncodeToString(data[:])
+		str := inputFileName
 		file_name := fmt.Sprintf("%s.%s", str, fileSuffix)
 		dir_path := GetUloadFileBaseDir()
 		dir_path = dir_path + "/"
@@ -84,8 +84,6 @@ func (this *UploadController) Post() {
 				result.Code = 0
 				result.FileName = str
 			}else {
-				fmt.Println("出错了~~~~~~~~~~~~~~~~~~~~~`")
-				fmt.Println(copyErr)
 				result.Code = 2
 			}
 			os.RemoveAll(oldPath)
