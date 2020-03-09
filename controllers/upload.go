@@ -2,6 +2,9 @@ package controllers
 
 import (
 	_ "bytes"
+	"crypto/md5"
+	"encoding/hex"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -11,7 +14,8 @@ import (
 
 type UploadResultInfo struct {
 	Code     int    `json:"code"`
-	FileName string `json:"fileName"`
+	HTMLFolderName string `json:"HTMLFolderName"`
+	IMAGEFolderName string `json:"IMAGEFolderName"`
 }
 
 type UploadController struct {
@@ -58,11 +62,14 @@ func (this *UploadController) Post() {
 		}
 
 		fileBytes, _ := ioutil.ReadAll(f)
-		//data := md5.Sum(fileBytes)
-
-		//str := hex.EncodeToString(data[:])
-		str := inputFileName
-		file_name := fmt.Sprintf("%s.%s", str, fileSuffix)
+		var folderName string
+		if len(inputFileName)>0 {
+			folderName = inputFileName
+		}else{
+			data := md5.Sum(fileBytes)
+			folderName = hex.EncodeToString(data[:])
+		}
+		file_name := fmt.Sprintf("%s.%s", folderName, fileSuffix)
 		dir_path := GetUloadFileBaseDir()
 		dir_path = dir_path + "/"
 
@@ -71,33 +78,76 @@ func (this *UploadController) Post() {
 		}
 		full_path := dir_path + file_name
 		io_error := ioutil.WriteFile(full_path, fileBytes, 0777)
-		script_path := GetScriptPath() + "/" + "ppt2html.scpt"
-		fmt.Println(full_path)
 		if io_error == nil && len(mountPath) > 0 {
-			cmd := exec.Command("osascript", script_path, full_path, dir_path)
-			_, cmdErr := cmd.CombinedOutput()
-			fmt.Println(cmdErr)
-			oldPath := dir_path  + str
-			newPath := mountPath + "/" + str
-			copyErr  := CopyFolder(oldPath, newPath)
-			if copyErr == nil {
+			exportHTML_ERR,html_folderName  :=  exportHTML(full_path,dir_path,mountPath,folderName)
+			exportImage_ERR,image_folderName  :=  exportImage(full_path,dir_path,mountPath,folderName)
+			if exportHTML_ERR == nil && exportImage_ERR == nil{
 				result.Code = 0
-				result.FileName = str
+				result.HTMLFolderName = html_folderName
+				result.IMAGEFolderName = image_folderName
 			}else {
 				result.Code = 2
 			}
-			os.RemoveAll(oldPath)
 			os.Remove(full_path)
 		}
 	}
-
-	cmd := exec.Command("killall", "Keynote")
-	cmd.CombinedOutput()
-
 	this.Data["json"] = result
 	this.ServeJSON()
 }
 
 func (this *UploadController) Get() {
 	this.TplName = "upload.html"
+}
+
+func exportHTML(input_file_path string,input_dir_path string,mountPath string,folderName string) (error,string) {
+	var err error
+	new_folderName := folderName+"_html"
+	if len(input_file_path)<1||len(input_dir_path)<1  {
+		err = errors.New("file or dir is not found")
+	}else {
+		if len(input_file_path)<1||len(input_dir_path)<1  {
+			err = errors.New("fileName is nil")
+		}else{
+			script_path := GetScriptPath() + "/" + "ppt2html.scpt"
+			cmd := exec.Command("osascript", script_path, input_file_path, input_dir_path)
+			_, cmdErr := cmd.CombinedOutput()
+			fmt.Println(cmdErr)
+			oldPath := input_dir_path  + folderName
+			newPath := mountPath + "/" + new_folderName
+			err = CopyFolder(oldPath, newPath)
+			os.RemoveAll(oldPath)
+			commond := exec.Command("killall", "Keynote")
+			commond.CombinedOutput()
+			if err != nil {
+				new_folderName = ""
+			}
+		}
+	}
+	return err,new_folderName
+}
+func exportImage(input_file_path string,input_dir_path string,mountPath string,folderName string) (error,string) {
+	var err error
+	new_folderName := folderName+"_image"
+	if len(input_file_path)<1||len(input_dir_path)<1  {
+		err = errors.New("file or dir is not found")
+	}else {
+		if len(input_file_path)<1||len(input_dir_path)<1  {
+			err = errors.New("fileName is nil")
+		}else{
+			script_path := GetScriptPath() + "/" + "ppt2image.scpt"
+			cmd := exec.Command("osascript", script_path, input_file_path, input_dir_path)
+			_, cmdErr := cmd.CombinedOutput()
+			fmt.Println(cmdErr)
+			oldPath := input_dir_path  + folderName
+			newPath := mountPath + "/" + new_folderName
+			err = CopyFolder(oldPath, newPath)
+			os.RemoveAll(oldPath)
+			commond := exec.Command("killall", "Keynote")
+			commond.CombinedOutput()
+			if err != nil {
+				new_folderName = ""
+			}
+		}
+	}
+	return err,new_folderName
 }
