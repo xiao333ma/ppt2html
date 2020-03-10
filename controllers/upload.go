@@ -15,7 +15,7 @@ import (
 type UploadResultInfo struct {
 	Code     int    `json:"code"`
 	FileName string `json:"fileName"`
-	IMAGEFolderName string `json:"IMAGEFolderName"`
+	FileNameImage string `json:"fileNameImage"`
 }
 
 type UploadController struct {
