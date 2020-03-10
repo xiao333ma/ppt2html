@@ -84,7 +84,7 @@ func (this *UploadController) Post() {
 			if exportHTML_ERR == nil && exportImage_ERR == nil{
 				result.Code = 0
 				result.FileName = html_folderName
-				result.IMAGEFolderName = image_folderName
+				result.FileNameImage = image_folderName
 			}else {
 				result.Code = 2
 			}
