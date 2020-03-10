@@ -14,7 +14,7 @@ import (
 
 type UploadResultInfo struct {
 	Code     int    `json:"code"`
-	HTMLFolderName string `json:"HTMLFolderName"`
+	FileName string `json:"fileName"`
 	IMAGEFolderName string `json:"IMAGEFolderName"`
 }
 
@@ -83,7 +83,7 @@ func (this *UploadController) Post() {
 			exportImage_ERR,image_folderName  :=  exportImage(full_path,dir_path,mountPath,folderName)
 			if exportHTML_ERR == nil && exportImage_ERR == nil{
 				result.Code = 0
-				result.HTMLFolderName = html_folderName
+				result.FileName = html_folderName
 				result.IMAGEFolderName = image_folderName
 			}else {
 				result.Code = 2
